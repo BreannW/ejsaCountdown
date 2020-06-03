@@ -52,12 +52,23 @@ body {
         <div class="text-container">
         <h1 id="name"> </h1>
         <h1 id="countDown"> </h1>
+        <p id="povText"> </p>
+        
+        
     </div>
 
-    </div>
+     
+    <form onsubmit="povFormHandle" id="povForm" >
+  <label for="povLabel">POV</label><br>
+  <input type="text" id="povInput" name="fname"><br>
+    <input type="submit" value="Submit">
+</form>
 
 </body>
 <script type="text/javascript">
+function povFormHandle(){
+alert(document.getElementById('povInput').value)
+}
 var requestOptions = {
     method: 'GET',
     redirect: 'follow'
