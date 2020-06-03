@@ -1,0 +1,143 @@
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
+
+<style type="text/css">
+body {
+    font-family: Roboto;
+    color:white;
+
+}
+
+.container {
+    background: black;
+    padding: 20px;
+    width: 500px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+}
+#photo-container{
+    display: flex;
+    max-width: 30%;
+}
+
+.photo {
+    width:auto;
+    height: 150px;
+}
+
+.text-container{
+	    width: 60%;
+	
+}
+
+#name{
+	margin-bottom: 0px;
+}
+
+#countdown{
+	margin-top: 0px;
+	font-weight: 300;
+	margin-bottom:0px;
+}
+
+
+#pov{
+  font-size:20px;
+  margin-top:0px;
+}
+
+
+#povLabel{
+color:black}
+
+
+</style>
+
+
+<body>
+
+    <div class="container">
+
+        <div id="photo-container"> </div>
+
+        <div class="text-container">
+        <h1 id="name"> </h1>
+        <h1 id="countDown"> </h1>
+        <p id="pov"> </p>
+        
+        
+    </div>
+    </div>
+ <p id="povText"> </p>
+     
+   
+  <label id="povLabel" for="povLabel">Enter POV</label><br>
+  <input type="text" id="povInput" name="fname"><br>
+  <button onClick ="povFormHandle()" id="submitPOV"> submit </button>
+
+</body>
+
+<script type="text/javascript">
+function povFormHandle() {
+  var povNumber = document.getElementById("povInput").value;
+
+  if (isNaN(povNumber)) {
+    alert("give me a number dummy");
+  } else {
+    document.getElementById('pov').innerHTML= "Probability of Violation: " + povNumber + '%';
+    
+    if(povNumber >= 70){
+       document.getElementById('pov').style.color="red"
+    }else if(povNumber >= 50){
+      document.getElementById('pov').style.color="yellow"
+    } else{
+      document.getElementById('pov').style.color="#00D100"
+
+
+    }
+  }
+}
+
+var requestOptions = {
+  method: "GET",
+  redirect: "follow"
+};
+
+fetch("https://api.spacexdata.com/v3/launches/next", requestOptions)
+  .then((response) => {
+    return response.json();
+  })
+  .then((response) => {
+    document.getElementById("name").innerHTML =
+      "<span>" + response.mission_name + "</span>";
+    document.getElementById("photo-container").innerHTML =
+      '<img src="' + response.links.mission_patch + ' " class="photo">';
+    var missionTime = Date.parse(response.launch_date_local);
+    var x = setInterval(function () {
+      var date = new Date().getTime();
+      var distance = missionTime - date;
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("countDown").innerHTML =
+        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+    }, 1000);
+
+    if (launch.launch_window != null) {
+      var text = document.createTextNode(
+        " Launch window:" + launch.launch_window
+      );
+      document.getElementById("info").appendChild(text);
+    }
+  });
+
+
+// .catch(error => console.log('error', error));
+</script>
