@@ -45,6 +45,7 @@ body {
 
 #pov{
   font-size:20px;
+  margin-top:0px;
 }
 
 
@@ -84,11 +85,11 @@ function povFormHandle() {
     document.getElementById('pov').innerHTML= "Probability of Violation: " + povNumber + '%';
     
     if(povNumber >= 70){
-       document.getElementById('pov').style.color="#00D100"
+       document.getElementById('pov').style.color="red"
     }else if(povNumber >= 50){
       document.getElementById('pov').style.color="yellow"
     } else{
-      document.getElementById('pov').style.color="red"
+      document.getElementById('pov').style.color="#00D100"
 
 
     }
