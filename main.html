@@ -1,7 +1,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-<script src="jquery.min.js"></script>
-<script src="jquery.textfill.min.js"></script>
+
 <style type="text/css">
 body {
     font-family: Roboto;
@@ -100,11 +99,11 @@ function povFormHandle() {
         document.getElementById("pov").innerHTML =
             "Probability of Violation: " + povNumber + "%";
         if (povNumber >= 70) {
-            document.getElementById("pov").style.color = "#00D100";
+            document.getElementById("pov").style.color = "red";
         } else if (povNumber >= 50) {
             document.getElementById("pov").style.color = "yellow";
         } else {
-            document.getElementById("pov").style.color = "red";
+            document.getElementById("pov").style.color = "#00D100";
         }
     }
 }
