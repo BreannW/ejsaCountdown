@@ -1,6 +1,7 @@
+
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-
-
+<script src="jquery.min.js"></script>
+<script src="jquery.textfill.min.js"></script>
 <style type="text/css">
 body {
     font-family: Roboto;
@@ -28,7 +29,7 @@ body {
     height: 150px;
 }
 
-.text-container{
+#text-container{
 	    width: 60%;
 	
 }
@@ -40,104 +41,158 @@ body {
 #countdown{
 	margin-top: 0px;
 	font-weight: 300;
-	margin-bottom:0px;
 }
 
 
 #pov{
   font-size:20px;
-  margin-top:0px;
 }
 
-
-#povLabel{
-color:black}
-
-
+#legal{
+	    position: absolute;
+    text-align: left;
+    top: 220px;
+    font-size: 10px;
+    left: 320px;
+}
 </style>
 
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 
 <body>
 
     <div class="container">
 
+		
+
         <div id="photo-container"> </div>
 
-        <div class="text-container">
+        <div id="text-container">
         <h1 id="name"> </h1>
+          <p id="provider"> </p>
         <h1 id="countDown"> </h1>
         <p id="pov"> </p>
         
         
     </div>
+    <p id="legal"> Created using rocketlaunch.live and r/spacex api's </p>
     </div>
  <p id="povText"> </p>
      
+  
+  
    
-  <label id="povLabel" for="povLabel">Enter POV</label><br>
+  <label for="povLabel">POV</label><br>
   <input type="text" id="povInput" name="fname"><br>
   <button onClick ="povFormHandle()" id="submitPOV"> submit </button>
 
+  <p id="test"> </p>
 </body>
+
 
 <script type="text/javascript">
 function povFormHandle() {
-  var povNumber = document.getElementById("povInput").value;
+    var povNumber = document.getElementById("povInput").value;
 
-  if (isNaN(povNumber)) {
-    alert("give me a number dummy");
-  } else {
-    document.getElementById('pov').innerHTML= "Probability of Violation: " + povNumber + '%';
-    
-    if(povNumber >= 70){
-       document.getElementById('pov').style.color="red"
-    }else if(povNumber >= 50){
-      document.getElementById('pov').style.color="yellow"
-    } else{
-      document.getElementById('pov').style.color="#00D100"
-
-
+    if (isNaN(povNumber)) {
+        alert("give me a number dummy");
+    } else {
+        document.getElementById("pov").innerHTML =
+            "Probability of Violation: " + povNumber + "%";
+        if (povNumber >= 70) {
+            document.getElementById("pov").style.color = "#00D100";
+        } else if (povNumber >= 50) {
+            document.getElementById("pov").style.color = "yellow";
+        } else {
+            document.getElementById("pov").style.color = "red";
+        }
     }
-  }
 }
 
 var requestOptions = {
-  method: "GET",
-  redirect: "follow"
+    method: "GET",
+    redirect: "follow"
 };
 
-fetch("https://api.spacexdata.com/v3/launches/next", requestOptions)
-  .then((response) => {
-    return response.json();
-  })
-  .then((response) => {
-    document.getElementById("name").innerHTML =
-      "<span>" + response.mission_name + "</span>";
-    document.getElementById("photo-container").innerHTML =
-      '<img src="' + response.links.mission_patch + ' " class="photo">';
-    var missionTime = Date.parse(response.launch_date_local);
-    var x = setInterval(function () {
-      var date = new Date().getTime();
-      var distance = missionTime - date;
-      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      var hours = Math.floor(
-        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+var providerName;
 
-      document.getElementById("countDown").innerHTML =
-        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-    }, 1000);
+async function getNextLaunch() {
+    let response = await fetch("https://fdo.rocketlaunch.live/json/launches/next/1");
+    let data = await response.json();
+    return data;
+}
 
-    if (launch.launch_window != null) {
-      var text = document.createTextNode(
-        " Launch window:" + launch.launch_window
-      );
-      document.getElementById("info").appendChild(text);
-    }
-  });
+async function getSpacexLaunch() {
+    let response = await fetch("https://api.spacexdata.com/v3/launches/next");
+    let data = await response.json();
+    return data;
+
+}
+getNextLaunch()
+    .then(data => providerName = data.result[0].provider.name)
+    .then(providerName => providerName = providerName.toLowerCase())
+    .then(providerName => {
+        console.log(providerName)
+        
+
+        if (providerName == 'spacex') {
+            getSpacexLaunch().then(data => {
+                document.getElementById("name").innerHTML ="<span>" + data.mission_name + "</span>";
+                document.getElementById("photo-container").innerHTML = '<img src="' + data.links.mission_patch + ' " class="photo">';
+                var missionTime = Date.parse(data.launch_date_local);
+                var x = setInterval(function() {
+                    var date = new Date().getTime();
+                    var distance = missionTime - date;
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor(
+                        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                    );
+                    var minutes = Math.floor(
+                        (distance % (1000 * 60 * 60)) / (1000 * 60)
+                    );
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById("countDown").innerHTML =
+                        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+                }, 1000);
+
+                if (launch.launch_window != null) {
+                    var text = document.createTextNode(
+                        " Launch window:" + launch.launch_window
+                    );
+                    document.getElementById("info").appendChild(text);
+                }
+            });
 
 
-// .catch(error => console.log('error', error));
+        } else {
+        getNextLaunch().then(data => {
+          document.getElementById("name").innerHTML ="<span>" + data.result[0].vehicle.name + " / " +  data.result[0].provider.name + "</span>";
+           document.getElementById("provider").style.display = "none"
+          document.getElementById("photo-container").style.display = "none"
+          document.getElementById("text-container").style.width = "100%"
+          document.getElementById("text-container").style.textAlign = "center"
+
+
+          var missionTime = Date.parse(data.result[0].win_open);
+                var x = setInterval(function() {
+                    var date = new Date().getTime();
+                    var distance = missionTime - date;
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor(
+                        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                    );
+                    var minutes = Math.floor(
+                        (distance % (1000 * 60 * 60)) / (1000 * 60)
+                    );
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById("countDown").innerHTML =
+                        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+                }, 1000);
+          
+        })
+      }
+})
+
 </script>
