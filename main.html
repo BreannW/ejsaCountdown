@@ -1,6 +1,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-
+<script src="jquery.min.js"></script>
+<script src="jquery.textfill.min.js"></script>
 <style type="text/css">
 body {
     font-family: Roboto;
@@ -99,11 +100,11 @@ function povFormHandle() {
         document.getElementById("pov").innerHTML =
             "Probability of Violation: " + povNumber + "%";
         if (povNumber >= 70) {
-            document.getElementById("pov").style.color = "red";
+            document.getElementById("pov").style.color = "#00D100";
         } else if (povNumber >= 50) {
             document.getElementById("pov").style.color = "yellow";
         } else {
-            document.getElementById("pov").style.color = "#00D100";
+            document.getElementById("pov").style.color = "red";
         }
     }
 }
@@ -116,10 +117,16 @@ var requestOptions = {
 var providerName;
 
 async function getNextLaunch() {
-    let response = await fetch("https://fdo.rocketlaunch.live/json/launches/next/1");
+    let response = await fetch("https://fdo.rocketlaunch.live/json/launches/next/2");
     let data = await response.json();
     return data;
 }
+
+// async function skipChina() {
+//     let response = await fetch("https://fdo.rocketlaunch.live/json/launches/next/2");
+//     let data = await response.json();
+//     return data;
+// }
 
 async function getSpacexLaunch() {
     let response = await fetch("https://api.spacexdata.com/v3/launches/next");
@@ -127,14 +134,46 @@ async function getSpacexLaunch() {
     return data;
 
 }
+
+
+
 getNextLaunch()
     .then(data => providerName = data.result[0].provider.name)
     .then(providerName => providerName = providerName.toLowerCase())
     .then(providerName => {
         console.log(providerName)
         
+        if (providerName == 'china') {
+            getNextLaunch().then(data => {
+          document.getElementById("name").innerHTML ="<span>" + data.result[1].vehicle.name + " / " +  data.result[1].provider.name + "</span>";
+           document.getElementById("provider").style.display = "none"
+          document.getElementById("photo-container").style.display = "none"
+          document.getElementById("text-container").style.width = "100%"
+          document.getElementById("text-container").style.textAlign = "center"
 
-        if (providerName == 'spacex') {
+
+          var missionTime = Date.parse(data.result[1].win_open);
+                var x = setInterval(function() {
+                    var date = new Date().getTime();
+                    var distance = missionTime - date;
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor(
+                        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                    );
+                    var minutes = Math.floor(
+                        (distance % (1000 * 60 * 60)) / (1000 * 60)
+                    );
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById("countDown").innerHTML =
+                        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+                }, 1000);
+          
+        })
+
+        }
+
+        else if (providerName == 'spacex') {
             getSpacexLaunch().then(data => {
                 document.getElementById("name").innerHTML ="<span>" + data.mission_name + "</span>";
                 document.getElementById("photo-container").innerHTML = '<img src="' + data.links.mission_patch + ' " class="photo">';
